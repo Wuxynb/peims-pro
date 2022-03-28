@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+<head th:replace="fragments :: head(~{::title})">
+    <meta charset="UTF-8">
+    <title>员工信息更新</title>
+</head>
+<style>
+    .icon-css-view {
+        position: absolute;
+        width: 40px;
+        height: 40px;
+        top: 7px;
+        right: 0px;
+        text-align: center;
+    }
+</style>
+<body>
+<div class="layui-layout layui-layout-admin">
+    <div th:replace="fragments :: header"></div>
+    <div th:replace="fragments :: menu"></div>
+    <div class="layui-body">
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 15px;">
+            <legend>员工信息更新界面</legend>
+        </fieldset>
+
+        <form class="layui-form layui-form-pane" action="" method="post">
+            <div class="layui-form-item">
+                <label class="layui-form-label">员工工号</label>
+                <div class="layui-input-block">
+                    <input type="text" name="id" disabled th:value="${param.id}" lay-verify="id" autocomplete="off"
+                           placeholder="请输入标题" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">员工姓名</label>
+                <div class="layui-input-block">
+                    <input type="text" name="username" th:value="${param.name}" lay-verify="required"
+                           lay-reqtext="用户名是必填项，岂能为空？" placeholder="请输入" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">员工工龄</label>
+                    <div class="layui-input-inline">
+                        <input type="number" name="phone" th:value="${param.seniority}" lay-verify="required|number"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">密 码</label>
+                <div class="layui-input-inline">
+                    <input id="password" type="password" name="username" th:value="${param.pwd}" lay-verify="required"
+                           lay-reqtext="用户名是必填项，岂能为空？" placeholder="请输入" autocomplete="off" class="layui-input">
+                    <div class="icon-css-view">
+                        <i id="iconShowView" class="layui-icon layui-icon-face-smile"
+                           style="color: lawngreen;"></i>
+                        <i id="iconHiddenView" class="layui-icon layui-icon-face-cry"
+                           style="color: orangered;" hidden></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">所在部门</label>
+                <div class="layui-input-block">
+                    <select name="interest" lay-filter="aihao">
+                        <option value=""></option>
+                        <option value="0">写作</option>
+                        <option value="1" selected="">阅读</option>
+                        <option value="2">游戏</option>
+                        <option value="3">音乐</option>
+                        <option value="4">旅行</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">职 位</label>
+                <div class="layui-input-block">
+                    <select name="interest" lay-filter="aihao">
+                        <option value=""></option>
+                        <option value="0">写作</option>
+                        <option value="1" selected="">阅读</option>
+                        <option value="2">游戏</option>
+                        <option value="3">音乐</option>
+                        <option value="4">旅行</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">单选框</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="sex" value="男" title="男" checked="">
+                    <input type="radio" name="sex" value="女" title="女">
+                    <input type="radio" name="sex" value="禁" title="禁用" disabled="">
+                </div>
+            </div>
+            <br><br><br>
+            <hr>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button type="submit" class="layui-btn" lay-submit="" lay-filter="demo1">立即提交</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+    <div th:replace="fragments :: footer"></div>
+
+</div>
+<div th:replace="fragments :: toolbar"></div>
+<div th:replace="fragments :: bar"></div>
+</body>
+<script>
+    layui.use(["layer"], function () {
+        var $ = layui.jquery;
+        // 是否显示密码
+        var password = $("#password");
+
+        $("#iconShowView").on('click', function (e) {
+            console.log("smile");
+            password[0].type = "text";
+            $("#iconShowView")[0].hidden = true;
+            $("#iconHiddenView")[0].hidden = false;
+            form.render();
+        });
+
+        $("#iconHiddenView").on('click', function (e) {
+            console.log("cry");
+            password[0].type = "password";
+            $("#iconShowView")[0].hidden = false;
+            $("#iconHiddenView")[0].hidden = true;
+            form.render();
+        });
+    });
+</script>
+</html>

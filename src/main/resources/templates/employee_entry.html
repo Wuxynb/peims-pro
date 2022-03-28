@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+<head th:replace="fragments :: head(~{::title})">
+    <meta charset="UTF-8">
+    <title>员工录入</title>
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+
+    <div th:replace="fragments :: header"></div>
+
+    <div th:replace="fragments :: menu"></div>
+
+    <div class="layui-body">
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 15px;">
+            <legend>员工录入界面</legend>
+        </fieldset>
+        <form class="layui-form layui-form-pane" action="">
+            <div class="layui-form-item">
+                <label class="layui-form-label">员工工号</label>
+                <div class="layui-input-block">
+                    <input type="text" name="userId" autocomplete="off" placeholder="请输入员工工号" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">员工姓名</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="username" lay-verify="required" placeholder="请输入员工姓名" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">出生日期</label>
+                    <div class="layui-input-block">
+                        <input type="date" name="date" id="date1" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">密码</label>
+                <div class="layui-input-inline">
+                    <input type="password" name="password" placeholder="请输入密码" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid layui-word-aux">请务必记住密码</div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">所在部门</label>
+                <div class="layui-input-inline">
+                    <select name="quiz1">
+                        <option value="">请选择省</option>
+                        <option value="浙江" selected="">浙江省</option>
+                        <option value="你的工号">江西省</option>
+                        <option value="你最喜欢的老师">福建省</option>
+                    </select>
+                </div>
+                <label class="layui-form-label">    职位</label>
+                <div class="layui-input-inline">
+                    <select name="quiz3">
+                        <option value="">请选择县/区</option>
+                        <option value="西湖区">西湖区</option>
+                        <option value="余杭区">余杭区</option>
+                        <option value="拱墅区">临安市</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item" pane="">
+                <label class="layui-form-label">单选框</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="sex" value="男" title="男" checked="">
+                    <input type="radio" name="sex" value="女" title="女">
+                    <input type="radio" name="sex" value="禁" title="禁用" disabled="">
+                </div>
+            </div>
+            <div class="layui-form-item" pane="">
+                <label class="layui-form-label">照片上传</label>
+                <div class="layui-input-block">
+                    <div class="layui-upload-drag" id="test10">
+                        <i class="layui-icon"></i>
+                        <p>点击上传，或将文件拖拽到此处</p>
+                        <div class="layui-hide" id="uploadDemoView">
+                            <hr>
+                            <img src="" alt="上传成功后渲染" style="max-width: 116px;max-height: 40px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-form-item" style="margin-left: 50px;">
+                <button class="layui-btn" lay-submit="" lay-filter="demo2">跳转式提交</button>
+            </div>
+        </form>
+    </div>
+
+    <div th:replace="fragments :: footer"></div>
+</div>
+
+<script>
+    //Demo
+    layui.use(['form', 'upload'], function () {
+        var form = layui.form, upload = layui.upload;
+
+        //监听提交
+        form.on('submit(formDemo)', function (data) {
+            layer.msg(JSON.stringify(data.field));
+            return false;
+        });
+
+        //拖拽上传
+        upload.render({
+            elem: '#test10'
+            ,url: 'https://httpbin.org/post' //此处用的是第三方的 http 请求演示，实际使用时改成您自己的上传接口即可。
+            ,done: function(res){
+                layer.msg('上传成功');
+                layui.$('#uploadDemoView').removeClass('layui-hide').find('img').attr('src', res.files.file);
+                console.log(res)
+            }
+        });
+    });
+</script>
+</body>
+</html>

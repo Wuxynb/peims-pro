@@ -1,0 +1,19 @@
+{
+  "properties": [
+    {
+      "name": "peims.name",
+      "type": "java.lang.String",
+      "description": "The name of the peims project."
+    },
+    {
+      "name": "peims.copyright-year",
+      "type": "java.lang.String",
+      "description": "The copyright year of the peims project."
+    },
+    {
+      "name": "peims.version",
+      "type": "java.lang.Integer",
+      "description": "Version number of the peims project."
+    }
+  ]
+}

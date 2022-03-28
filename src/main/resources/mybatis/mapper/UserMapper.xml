@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.peims.mapper.UserMapper">
+    <resultMap id="user" type="com.example.peims.pojo.User">
+        <id property="PK_User_Id_nb" column="PK_User_Id_nb"/>
+        <result property="User_Name_s" column="User_Name_s"/>
+        <result property="User_Password_nb" column="User_Password_nb"/>
+        <result property="User_Seniority_n" column="User_Seniority_n"/>
+        <result property="FK_User_PostionId_nb" column="FK_User_PostionId_nb"/>
+        <result property="FK_User_DepartmentId_nb" column="FK_User_DepartmentId_nb"/>
+        <result property="User_Sex_s" column="User_Sex_s"/>
+        <result property="User_PhotoURL_s" column="User_PhotoURL_s"/>
+        <association property="department" javaType="com.example.peims.pojo.Department">
+            <id property="PK_Dptm_id_nb" column="PK_Dptm_id_nb"/>
+            <result property="Dptm_Name_s" column="Dptm_Name_s"/>
+        </association>
+        <association property="position" javaType="com.example.peims.pojo.Position">
+            <id property="PK_Position_Id_nb" column="PK_Position_Id_nb"/>
+            <result property="Position_Name_s" column="Position_Name_s"/>
+        </association>
+    </resultMap>
+
+    <select id="getAllUsers" resultMap="user">
+        select user.*, dptm.Dptm_Name_s, position.Position_Name_s
+        from peims.user,
+             peims.dptm,
+             peims.position
+        where user.FK_User_DepartmentId_nb = dptm.PK_Dptm_id_nb
+          and user.FK_User_PostionId_nb = position.PK_Position_Id_nb;
+    </select>
+
+    <select id="queryUsersByUsername" parameterType="String" resultMap="user">
+        select user.*, dptm.Dptm_Name_s, position.Position_Name_s
+        from peims.user,
+             peims.dptm,
+             peims.position
+        where user.FK_User_DepartmentId_nb = dptm.PK_Dptm_id_nb
+          and user.FK_User_PostionId_nb = position.PK_Position_Id_nb
+          and user.User_Name_s like concat('%', #{username}, '%')
+    </select>
+
+    <select id="queryUserById" parameterType="int" resultMap="user">
+        select *
+        from peims.user
+        where PK_User_Id_nb = #{id}
+    </select>
+
+    <update id="updateUser" parameterType="com.example.peims.pojo.User">
+        update peims.user
+        set User_Name_s             = #{newUser.User_Name_s},
+            User_Password_nb        = #{newUser.User_Password_nb},
+            User_Seniority_n        = #{newUser.User_Seniority_n},
+            User_Sex_s              = #{newUser.User_Sex_s},
+            User_PhotoURL_s         = #{newUser.User_PhotoURL_s},
+            FK_User_PostionId_nb    = #{newUser.position.PK_Position_Id_nb},
+            FK_User_DepartmentId_nb = #{newUser.department.PK_Dptm_id_nb}
+        where PK_User_Id_nb = #{newUser.PK_User_Id_nb}
+    </update>
+
+    <insert id="insertUser" parameterType="com.example.peims.pojo.User">
+        insert into peims.user(PK_User_Id_nb, FK_User_DepartmentId_nb, FK_User_PostionId_nb, User_Name_s,
+                               User_Password_nb, User_Seniority_n, User_Sex_s, User_PhotoURL_s)
+        values (#{user.PK_User_Id_nb}, #{user.department.PK_Dptm_id_nb}, #{user.position.PK_Position_Id_nb},
+                #{user.User_Name_s}, #{user.User_Password_nb}, #{user.User_Seniority_n}, #{user.User_Sex_s},
+                #{user.User_PhotoURL_s})
+    </insert>
+
+    <delete id="deleteUser" parameterType="int">
+        delete
+        from user
+        where PK_User_Id_nb = #{userId}
+    </delete>
+</mapper>

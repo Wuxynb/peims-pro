@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+<head th:fragment="head(title)">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title th:replace="${title}"></title>
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}">
+    <script type="text/javascript" th:src="@{layui/layui.js}"></script>
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+
+    <div class="layui-header" th:fragment="header">
+        <div class="layui-logo">生产型企业信息化管理系统</div>
+        <!-- 头部区域（可配合layui 已有的水平导航） -->
+        <!--<ul class="layui-nav layui-layout-left">
+            <li class="layui-nav-item"><a href="">nav 1</a></li>
+            <li class="layui-nav-item"><a href="/employeeEntry" target="iframe-main">员工录入</a></li>
+            <li class="layui-nav-item"><a href="">nav 3</a></li>
+            <li class="layui-nav-item">
+                <a href="javascript:">nav groups</a>
+                <dl class="layui-nav-child">
+                    <dd><a href="">menu 11</a></dd>
+                    <dd><a href="">menu 22</a></dd>
+                    <dd><a href="">menu 33</a></dd>
+                </dl>
+            </li>
+        </ul>-->
+        <ul class="layui-nav layui-layout-right">
+            <li class="layui-nav-item">
+                <a href="javascript:">
+                    <img src="//tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg"
+                         class="layui-nav-img" alt="navigate img">
+                    tester
+                </a>
+                <dl class="layui-nav-child">
+                    <dd><a href="">set 1</a></dd>
+                    <dd><a href="">set 2</a></dd>
+                </dl>
+            </li>
+            <li class="layui-nav-item"><a href="">Sign out</a></li>
+        </ul>
+    </div>
+
+    <div class="layui-side layui-bg-black" th:fragment="menu">
+        <div class="layui-side-scroll">
+            <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+            <ul class="layui-nav layui-nav-tree" lay-filter="test">
+                <li class="layui-nav-item layui-nav-itemed">
+                    <a class="" href="javascript:">员工管理</a>
+                    <dl class="layui-nav-child"> <!--  target="iframe-main" -->
+                        <dd><a class="link-active" data-id="1" data-title="员工信息查询" href="/employeeManage">员工信息查询</a>
+                        </dd>
+                        <dd><a class="link-active" data-id="2" data-title="员工录入" href="/employeeEntry">员工录入</a></dd>
+                        <dd><a class="link-active" data-id="3" data-title="员工信息更新" href="/employeeUpdate">员工信息更新</a>
+                        </dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item layui-nav-itemed">
+                    <a href="javascript:;">考勤管理</a>
+                    <dl class="layui-nav-child">
+                        <dd><a href="/checkManage">考勤信息查询</a></dd>
+                        <dd><a href="javascript:;">打卡签到</a></dd>
+                        <dd><a href="javascript:">考勤信息更新</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item">
+                    <a href="/moreInfo">更多信息</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="layui-body" th:fragment="content">
+        <!-- 内容主体区域 -->
+
+    </div>
+
+    <div class="layui-footer" th:fragment="footer">
+        <!-- 底部固定区域 -->
+        © 2022 Powered by Wuxy
+    </div>
+</div>
+
+<script type="text/html" id="toolbarDemo" th:fragment="toolbar">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" lay-event="getCheckData">获取选中行数据</button>
+        <button class="layui-btn layui-btn-sm" lay-event="getCheckLength">获取选中数目</button>
+        <button class="layui-btn layui-btn-sm" lay-event="isAll">验证是否全选</button>
+    </div>
+</script>
+
+<script type="text/html" id="barDemo" th:fragment="bar">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+
+<th:block th:fragment="script">
+    <script>
+        layui.use(['element', 'layer'], function () {
+
+            const $ = layui.jquery;
+            const element = layui.element; //Tab的切换功能，切换事件监听等，需要依赖element模块
+
+            // 定义函数，绑定增加的tab，删除tab，切换tab
+            const tabFunction = {
+                // 新增tab url 页面地址 id 对应data-id name 标题
+                tabAdd: function (url, id, name) {
+                    var cilentHeinght = $(window).height();
+                    console.log(cilentHeinght + 'px');
+                    element.tabAdd('tables', {
+                        title: name,
+                        content: `<iframe data-frameid="${id}" scrolling="auto" frameborder="0" src="${url}" style="width: 100%; height: ${cilentHeinght * 0.95}px;"></iframe>`,
+                        id: id
+                    });
+                },
+                // 根据id切换tab
+                tabChange: function (id) {
+                    element.tabChange('tables', id);
+                },
+                // 关闭指定的tab
+                tabDelete: function (id) {
+                    element.tabDelete('tables', id);
+                }
+            };
+            const layer = layui.layer;
+
+            // 左侧菜单点击事件
+            $('.link-active').on('click', function () {
+                var dataId = $(this);
+                // 判断右侧是否有tab
+                if ($('.layui-tab-title li[lay-id]').length <= 0) {
+                    tabFunction.tabAdd(dataId.attr('lay-href'), dataId.attr('data-id'), dataId.attr('data-title'));
+                } else {
+                    // 判断tab是否已经存在
+                    var exist = false;
+                    $.each($('.layui-tab-title li[lay-id]'), function () {
+                        // 筛选id是否存在
+                        if ($(this).attr('lay-id') === dataId.attr('data-id')) exist = true;
+                    });
+                    // 不存在，增加tab
+                    if (!exist) {
+                        tabFunction.tabAdd(dataId.attr('lay-href'), dataId.attr('data-id'), dataId.attr('data-title'));
+                    }
+                }
+                // 转到要打开的tab
+                tabFunction.tabChange(dataId.attr('data-id'));
+
+                window.location = dataId.attr('lay-href');
+            });
+
+            function initialize() {
+                layer.msg('欢迎登陆！');
+                tabFunction.tabAdd('/employeeManage', '1', '员工信息管理');
+                tabFunction.tabChange('1');
+            }
+
+            initialize();
+        });
+    </script>
+</th:block>
+
+</body>
+</html>

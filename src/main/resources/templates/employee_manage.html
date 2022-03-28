@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+<head th:replace="fragments :: head(~{::title})">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>管理主页</title>
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+    <!-- header -->
+    <div th:replace="fragments :: header"></div>
+
+    <!-- menu -->
+    <div th:replace="fragments :: menu"></div>
+
+    <!-- content -->
+    <div class="layui-body">
+        <!-- 内容主体区域 -->
+        <div style="padding: 1px;margin-top: 10px;"><p style="margin-left: 25px;">用户信息列表</p>
+            <table class="layui-hide" id="test" lay-filter="test"></table>
+            <div id="laypage" style="margin-top: -10px;"></div>
+        </div>
+    </div>
+
+    <div th:replace="fragments :: footer"></div>
+
+    <div th:replace="fragments :: toolbar"></div>
+    <div th:replace="fragments :: bar"></div>
+
+    <form id="updateForm" action="/employeeUpdate" content="application/json" method="post" hidden>
+        <input name="id" id="uid" value="">
+        <input name="name" id="uname" value="">
+        <input name="pwd" id="upwd" value="">
+        <input name="seniority" id="usen" value="">
+        <input name="positionId" id="posi" value="">
+        <input name="departmentId" id="dptmi" value="">
+        <input name="dptm" id="dptm" value="">
+        <input name="position" id="pos" value="">
+    </form>
+</div>
+
+<script>
+    layui.use(['layer', 'table', 'laypage'], function () {
+        var table = layui.table, laypage = layui.laypage, layer = layui.layer; //获得laypage模块
+        var $ = layui.jquery;
+        // JavaScript代码区域,
+        let curNum = 1, limitCount = 10;
+
+        function queryUser(start, limitSize, userName) {
+            // console.log(`start: ${start}, limitSize: ${limitSize}, userName: ${userName}`)
+            console.log('/api/v1/employees/query?pageNum=' + curNum + '&pageSize=' + limitSize + '&User_Name_s=' + userName,)
+            table.render({
+                elem: '#test', // 对应table容器元素的id属性值
+                method: 'POST',
+                url: '/api/v1/employees/query?pageNum=' + curNum + '&pageSize=' + limitSize + '&User_Name_s=' + userName,
+                // url: '/api/v1/employees/query',
+                // where: {'pageNum': curNum, 'pageSize': limitSize, 'userName': ''},
+                contentType: 'application/json',
+                request: {
+                    pageName: 'pageNum',  // 页码的参数名称，默认：page
+                    limitName: 'pageSize' // 每页数据量的参数名，默认：limit
+                },
+                toolbar: '#toolbarDemo', //开启头部工具栏，并为其绑定左侧模板
+                defaultToolbar: ['filter', 'exports', 'print', { //自定义头部工具栏右侧图标。如无需自定义，去除该参数即可
+                    title: '提示'
+                    , layEvent: 'LAYTABLE_TIPS'
+                    , icon: 'layui-icon-tips'
+                }],
+                title: '用户数据表', // Note: 因为\[\[…\]\]之间的表达式在thymeleaf被认为是内联表达式,所以渲染错误
+                cols: [
+                    [
+                        {type: 'checkbox', fixed: 'left'},
+                        {field: 'pk_User_Id_nb', title: 'ID', width: 120, fixed: 'left', unresize: true, sort: true},
+                        {field: 'user_Name_s', title: '用户名', width: 120, edit: 'text'},
+                        {field: 'user_Seniority_n', title: '工龄', width: 100, edit: 'text', sort: true},
+                        {
+                            field: 'department', title: '部门ID', width: 100, templet: function (res) {
+                                return '<div>' + res.department.dptm_Name_s + '</div>';
+                            }, align: 'center'
+                        },
+                        {
+                            field: 'position', title: '职位ID', width: 100, templet: function (res) {
+                                return '<div>' + res.position.position_Name_s + '</div>';
+                            }
+                        },
+                        {field: 'user_Sex_s', title: '性别', width: 100},
+                        {field: 'user_PhotoURL_s', title: '照片路径'},
+                        {fixed: 'right', title: '操作', toolbar: '#barDemo', width: 150} // 设置表头工具类
+                    ]
+                ],
+                page: false, // 开启分页
+                parseData: function (res) { // 原始返回数据
+                    return {
+                        "code": res.code, // 解析接口状态
+                        "msg": res.msg, // 解析提示文本
+                        "count": res.count, // 解析数据长度
+                        "data": res.data // 解析数据列表
+                    };
+                },
+                done: function (res, curr, count) { // 无论是异步请求数据，还是直接赋值数据，都会触发该回调。你可以利用该回调做一些表格以外元素的渲染。
+                    // 如果是异步请求数据方式，res即为接口返回的信息，curr当前页码，count数据总量。
+                    // 人工是直接赋值的方式，res即为：{data: [], count: 39} data为当前页数据、count为数据总长度
+                    // laypage 元素渲染
+                    laypage.render({
+                        elem: 'laypage' // 注意，这里的test1是ID，不用加#号
+                        , count: count // 数据总数，从服务其得到
+                        , curr: curNum
+                        , limit: limitCount // 每页显示几条数据
+                        , limits: [1, 10, 20, 30] // 每页显示几条数据
+                        , layout: ['prev', 'page', 'next', 'skip', 'count', 'limit', 'refresh'] // 自定义布局内容
+                        , groups: 10 // 连续显示的页码数
+                        // jump - 切换分页的回调
+                        // 当分页被切换时触发，函数返回两个参数：obj（当前分页的所有选项值）、first（是否首次，一般用于初始加载的判断
+                        , jump: function (obj, first) { //obj为当前页的属性和方法，第一次加载first为true
+                            if (!first) {
+                                curNum = obj.curr; // obj.curr得到当前页
+                                limitCount = obj.limit; //obj.limit得到每页显示的条数
+                                // console.log(`curNum: ${curNum}, limitCount: ${limitCount}`)
+                                queryUser(curNum, limitCount, userName);
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        // 初次进入页面，显示数据
+        queryUser(curNum, limitCount, '');
+
+        // 头工具栏事件
+        table.on('toolbar(test)', function (obj) {
+            var checkStatus = table.checkStatus(obj.config.id);
+            switch (obj.event) {
+                case 'getCheckData':
+                    let data = checkStatus.data;
+                    layer.alert(JSON.stringify(data));
+                    break;
+                case 'getCheckLength':
+                    let length = checkStatus.data.length;
+                    layer.msg('选中了：' + length + ' 个');
+                    break;
+                case 'isAll':
+                    layer.msg(checkStatus.isAll ? '全选' : '未全选');
+                    break;
+
+                //自定义头工具栏右侧图标 - 提示
+                case 'LAYTABLE_TIPS':
+                    layer.alert('这是工具栏右侧自定义的一个图标按钮');
+                    break;
+            }
+        });
+
+        //监听行工具事件
+        table.on('tool(test)', function (obj) {
+            var data = obj.data;
+            //console.log(obj)
+            if (obj.event === 'del') {
+                layer.confirm('真的删除行么', function (index) {
+                    obj.del();
+                    layer.close(index);
+                });
+            } else if (obj.event === 'edit') {
+                $('#uid').val(data.pk_User_Id_nb);
+                $('#uname').val(data.user_Name_s);
+                $('#upwd').val(data.user_Password_nb);
+                $('#usen').val(data.user_Seniority_n);
+                $('#posi').val(data.fk_User_PostionId_nb);
+                $('#pos').val(data.position.position_Name_s);
+                $('#dptmi').val(data.fk_User_DepartmentId_nb);
+                $('#dptm').val(data.department.dptm_Name_s);
+                $('#updateForm').submit();
+
+                /*$.ajax({
+                    method: 'POST',
+                    url: '/updateEmployee',
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    data: JSON.stringify(data),
+                    success: function (response) {
+
+                    },
+                    complete: function (response) {
+                        console.log(response);
+                        window.location.href = `${response.responseText}`;
+                    }
+                })*/
+
+                /*layer.prompt({
+                    formType: 2
+                    , value: data.email
+                }, function (value, index) {
+                    obj.update({
+                        email: value
+                    });
+                    layer.close(index);
+                });*/
+            }
+        });
+    });
+
+</script>
+</body>
+</html>

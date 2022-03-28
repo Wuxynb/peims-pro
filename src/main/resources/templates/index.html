@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+<html>
+<head th:replace="fragments :: head(~{::title})">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>管理主页</title>
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+    <div th:replace="fragments :: header"></div>
+
+    <div th:replace="fragments :: menu"></div>
+
+    <div class="layui-body">
+        <!-- 内容主体区域 -->
+        <div class="layui-tab" lay-filter="tables" lay-allowclose="true">
+            <ul class="layui-tab-title"></ul>
+            <div class="layui-tab-content"></div>
+        </div>
+    </div>
+    <div th:replace="fragments :: footer"></div>
+</div>
+
+<div th:replace="fragments :: toolbar"></div>
+<div th:replace="fragments :: bar"></div>
+
+<script>
+    layui.use(['element', 'layer'], function () {
+
+        const $ = layui.jquery;
+        const element = layui.element; //Tab的切换功能，切换事件监听等，需要依赖element模块
+
+        // 定义函数，绑定增加的tab，删除tab，切换tab
+        const tabFunction = {
+            // 新增tab url 页面地址 id 对应data-id name 标题
+            tabAdd: function (url, id, name) {
+                var cilentHeinght = $(window).height();
+                console.log(cilentHeinght + 'px');
+                element.tabAdd('tables', {
+                    title: name,
+                    content: `<iframe data-frameid="${id}" scrolling="auto" frameborder="0" src="${url}" style="width: 100%; height: ${cilentHeinght * 0.95}px;"></iframe>`,
+                    id: id
+                });
+            },
+            // 根据id切换tab
+            tabChange: function (id) {
+                element.tabChange('tables', id);
+            },
+            // 关闭指定的tab
+            tabDelete: function (id) {
+                element.tabDelete('tables', id);
+            }
+        };
+        const layer = layui.layer;
+
+        // 左侧菜单点击事件
+        $('.link-active').on('click', function () {
+           var dataId = $(this);
+           // 判断右侧是否有tab
+            if ($('.layui-tab-title li[lay-id]').length <= 0) {
+                tabFunction.tabAdd(dataId.attr('lay-href'), dataId.attr('data-id'), dataId.attr('data-title'));
+            } else {
+
+                // 判断tab是否已经存在
+                var exist = false;
+                $.each($('.layui-tab-title li[lay-id]'), function () {
+                   // 筛选id是否存在
+                   if ($(this).attr('lay-id') === dataId.attr('data-id')) exist = true;
+                });
+
+                // 不存在，增加tab
+                if (!exist) {
+                    tabFunction.tabAdd(dataId.attr('lay-href'), dataId.attr('data-id'), dataId.attr('data-title'));
+                }
+            }
+            // 转到要打开的tab
+            tabFunction.tabChange(dataId.attr('data-id'))
+        });
+
+        function initialize() {
+            layer.msg('欢迎登陆！');
+            tabFunction.tabAdd('/employeeManage', '1', '员工信息管理');
+            tabFunction.tabChange('1');
+        }
+
+        initialize();
+    });
+</script>
+</body>
+</html>

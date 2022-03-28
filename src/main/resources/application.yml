@@ -1,0 +1,71 @@
+peims:
+  name: Peims
+  version: 2
+  copyright-year: 2020
+
+logging:
+  level:
+    com:
+      example:
+        peims:
+          mapper: debug
+
+
+mybatis:
+  config-location: classpath:mybatis/mybatis-config.xml
+  mapper-locations: classpath:mybatis/mapper/*.xml
+
+server:
+  port: 8080
+  servlet:
+    context-path: /
+  tomcat:
+    uri-encoding: UTF-8
+    threads:
+      max: 800
+      min-spare: 50
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/peims?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456
+
+  # 热部署配置
+  devtools:
+    restart:
+      enabled: true
+      # 设置重启的目录，添加目录的文件需要restart
+      additional-paths: src/main/java
+      # 解决项目自动重新编译后接口报404的问题
+      poll-interval: 3000
+      quiet-period: 1000
+
+  jackson:
+    serialization:
+      indent-output: true
+
+  thymeleaf:
+    cache: false
+    encoding: UTF-8
+    mode: HTML
+    check-template-location: true
+    prefix: classpath:/templates/
+    servlet:
+      content-type: text/html
+    suffix: .html
+
+  web:
+    resources:
+      static-locations: classpath:/static/
+
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+pagehelper:
+  helper-dialect: mysql
+#  reasonable: false
+#  support-methods-arguments: true
+#  params: count=countSql
